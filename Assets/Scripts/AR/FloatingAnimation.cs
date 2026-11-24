@@ -23,6 +23,8 @@ public class FloatingAnimation : MonoBehaviour
 
     private Vector3 mInitialLocalPosition;
     private bool mInitialized = false;
+    private Quaternion mInitialRotation;
+    private float mElapsed;
 
     private void Awake()
     {
@@ -32,6 +34,7 @@ public class FloatingAnimation : MonoBehaviour
     private void OnEnable()
     {
         CacheInitialPosition();
+        mElapsed = 0f;
     }
 
     private void CacheInitialPosition()
@@ -39,13 +42,16 @@ public class FloatingAnimation : MonoBehaviour
         if (!mInitialized)
         {
             mInitialLocalPosition = transform.localPosition;
+            mInitialRotation = transform.localRotation;
             mInitialized = true;
         }
     }
 
     private void Update()
     {
-        float yOffset = Mathf.Sin((Time.time * frequency) + phaseOffset) * amplitude;
+        mElapsed += Time.deltaTime;
+        float fade = Mathf.SmoothStep(0f, 1f, mElapsed / 0.6f);
+        float yOffset = Mathf.Sin((mElapsed * frequency) + phaseOffset) * amplitude * fade;
         transform.localPosition = new Vector3(
             mInitialLocalPosition.x,
             mInitialLocalPosition.y + yOffset,
@@ -54,8 +60,14 @@ public class FloatingAnimation : MonoBehaviour
 
         if (enableGentleRotation)
         {
-            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.Self);
+            transform.localRotation = mInitialRotation * Quaternion.Euler(0f, rotationSpeed * mElapsed, 0f);
         }
     }
-}
 
+    private void OnDisable()
+    {
+        if (!mInitialized) return;
+        transform.localPosition = mInitialLocalPosition;
+        transform.localRotation = mInitialRotation;
+    }
+}

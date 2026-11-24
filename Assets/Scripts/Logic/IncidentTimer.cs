@@ -145,16 +145,16 @@ public class IncidentTimer : MonoBehaviour
             {
                 if (totalSimulatedHoursLost <= 0.05f || (gm != null && gm.ValidateDefenseResponses()))
                 {
-                    timerText.text = "<color=#4ADE80><b>TIEMPO PERDIDO: 00h / 85h</b></color>\n<size=17><color=#86EFAC>[CON PLAN: CONGELADO EL VIERNES - DINERO A SALVO]</color></size>";
+                    timerText.text = "<color=#59DEC9><b>00 h</b></color>  /  Fondos protegidos";
                 }
                 else
                 {
-                    timerText.text = "<color=#38BDF8><b>CRONOMETRO - MODO DEFENSA</b></color>\n<size=17><color=#BAE6FD>[VIE 5: Activa el plan para congelar en 0h]</color></size>";
+                    timerText.text = "<color=#59DEC9>VIERNES</color>  /  Activa tu plan";
                 }
             }
             else
             {
-                timerText.text = $"<color=#F87171><b>TIEMPO PERDIDO: {totalSimulatedHoursLost:00}h / 85h</b></color>\n<size=17><color=#FCA5A5>[SIN PLAN: CONGELADO MARTES 9:11 - TARDE]</color></size>";
+                timerText.text = $"<color=#F4AA8B><b>{totalSimulatedHoursLost:00} h</b></color>  /  85 h transcurridas";
             }
         }
     }

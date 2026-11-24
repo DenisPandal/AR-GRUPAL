@@ -17,13 +17,19 @@ public class SubtitleLine
 {
     public string speaker;
     [TextArea(2, 4)] public string text;
+    [Tooltip("Clave opcional del clip de voz en Resources/Audio/Narrator para el narrador hablado.")]
+    public string audioKey;
+    [Tooltip("Clip de audio personalizado opcional para la locución de este diálogo.")]
+    public AudioClip customAudioClip;
 
     public SubtitleLine() { }
 
-    public SubtitleLine(string speaker, string text)
+    public SubtitleLine(string speaker, string text, string audioKey = null, AudioClip customAudioClip = null)
     {
         this.speaker = speaker;
         this.text = text;
+        this.audioKey = audioKey;
+        this.customAudioClip = customAudioClip;
     }
 }
 
@@ -97,6 +103,8 @@ public class StoryDirector : MonoBehaviour
     public ActionPicker actionPicker;
     public IncidentTimer incidentTimer;
     public ScenarioHUDController hud;
+    [Tooltip("Gestor de locución y narración hablada exclusivo para los diálogos.")]
+    public DialogueNarrator narrator;
 
     [Header("Detección de Superficie (Mesa AR)")]
     public PlaneFinderBehaviour planeFinder;
@@ -195,6 +203,7 @@ public class StoryDirector : MonoBehaviour
     private Quaternion mSurfaceRotation = Quaternion.identity;
     private Coroutine mStoryRoutine;
     private Coroutine mAlertRoutine;
+    private Coroutine mIntroWelcomeRoutine;
 
     private void Awake()
     {
@@ -217,6 +226,16 @@ public class StoryDirector : MonoBehaviour
         if (incidentTimer == null) incidentTimer = FindAnyObjectByType<IncidentTimer>();
         if (hud == null) hud = FindAnyObjectByType<ScenarioHUDController>();
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
+        if (narrator == null) narrator = FindAnyObjectByType<DialogueNarrator>();
+        if (narrator == null)
+        {
+            var narratorGo = new GameObject("DialogueNarrator");
+            narrator = narratorGo.AddComponent<DialogueNarrator>();
+        }
+        if (narrator != null && narrator.musicAudioSource == null && musicSource != null)
+        {
+            narrator.musicAudioSource = musicSource;
+        }
 
         if (days == null || days.Count == 0)
         {
@@ -384,9 +403,15 @@ public class StoryDirector : MonoBehaviour
     /// </summary>
     public void ShowModeSelectionScreen()
     {
+        if (mIntroWelcomeRoutine != null)
+        {
+            StopCoroutine(mIntroWelcomeRoutine);
+            mIntroWelcomeRoutine = null;
+        }
         if (mStoryRoutine != null) StopCoroutine(mStoryRoutine);
         StopAllCoroutines();
         mBusyWithLine = false;
+        if (narrator != null) narrator.StopSpeaking();
         mStagePlaced = false;
         currentDayIndex = 0;
 
@@ -423,6 +448,40 @@ public class StoryDirector : MonoBehaviour
                 }
             }
         }
+
+        // Bienvenida breve: las dos tarjetas explican la elección sin una secuencia de cinco párrafos.
+        if (narrator != null)
+            narrator.Speak(new SubtitleLine("NARRADOR",
+                "Bienvenido a la simulación interactiva en Realidad Aumentada del ciberataque financiero de 2016.",
+                "intro_welcome_1"));
+    }
+
+    /// <summary>
+    /// Locución narrativa y subtítulos de bienvenida al entrar al juego: explica qué hará el usuario y las opciones de Ataque vs Defensa.
+    /// </summary>
+    private IEnumerator IntroWelcomeRoutine()
+    {
+        yield return new WaitForSeconds(0.4f);
+
+        var welcomeLines = new List<SubtitleLine>
+        {
+            new SubtitleLine("BIENVENIDO · ESCENARIO 06", "Bienvenido a la simulación interactiva en Realidad Aumentada del ciberataque financiero de 2016.", "intro_welcome_1"),
+            new SubtitleLine("¿QUÉ HARÁS EN EL JUEGO?", "Analizarás cronológicamente cómo se desarrolló el ataque desde el Viernes hasta el Martes, interactuando con los objetos en tu mesa.", "intro_welcome_2"),
+            new SubtitleLine("OPCIÓN 1 · MODO ATAQUE", "En Modo Ataque revivirás los hechos reales de 2016, donde la falta de respuesta rápida causó la pérdida de US$58 millones.", "intro_welcome_3"),
+            new SubtitleLine("OPCIÓN 2 · MODO DEFENSA", "En Modo Defensa aplicarás las 3 medidas clave para congelar los fondos el mismo viernes sin sufrir ningún daño.", "intro_welcome_4"),
+            new SubtitleLine("ELIGE TU MODO EN PANTALLA", "Selecciona Modo Ataque o Modo Defensa en pantalla para comenzar tu investigación en la mesa.", "intro_welcome_5")
+        };
+
+        foreach (var line in welcomeLines)
+        {
+            if (state != StoryState.Intro) yield break;
+            yield return ShowLine(line, true);
+        }
+
+        if (state == StoryState.Intro)
+        {
+            ShowPersistentPrompt("Selecciona MODO ATAQUE o MODO DEFENSA en los botones de arriba para iniciar la simulación.");
+        }
     }
 
     /// <summary>
@@ -443,6 +502,14 @@ public class StoryDirector : MonoBehaviour
 
     private void BeginStoryWithMode(SimMode selectedMode)
     {
+        if (mIntroWelcomeRoutine != null)
+        {
+            StopCoroutine(mIntroWelcomeRoutine);
+            mIntroWelcomeRoutine = null;
+        }
+        if (narrator != null) narrator.StopSpeaking();
+        else if (DialogueNarrator.I != null) DialogueNarrator.I.StopSpeaking();
+
         if (mStoryRoutine != null) StopCoroutine(mStoryRoutine);
         StopAllCoroutines();
         mBusyWithLine = false;
@@ -502,7 +569,7 @@ public class StoryDirector : MonoBehaviour
             string modeLabel = (gameManager != null && gameManager.mode == SimMode.Defensa)
                 ? "MODO DEFENSA (CON PLAN: CONGELADO EL VIERNES)"
                 : "MODO ATAQUE (ATAQUE 2016: VIE 5 -> MAR 9)";
-            scanHintText.text = $"<b>[{modeLabel}]</b>\n1. Apunta la cámara hacia tu mesa o superficie plana.\n2. Verás la retícula de detección de Vuforia sobre la mesa.\n3. <b>Toca la superficie</b> para fijar el escenario allí (o pulsa 'Centrar en Mesa').";
+            scanHintText.text = "<size=34><b>Tu mesa es el escenario.</b></size>\nApunta a una superficie plana y tócala para colocar el caso.";
         }
 
         if (planeFinder != null) planeFinder.gameObject.SetActive(true);
@@ -840,8 +907,8 @@ public class StoryDirector : MonoBehaviour
         {
             yield return PlayLines(new List<SubtitleLine>
             {
-                new SubtitleLine("SIMULACIÓN · ESCENARIO 6", "MODO DEFENSA (VIE 5): Hugo Benavides ve la impresora de confirmaciones SWIFT apagada sobre la mesa."),
-                new SubtitleLine("PLAN DE RESPUESTA", "A diferencia del ataque de 2016, hoy cuentas con un Plan de Respuesta con roles, conciliación automática y escalamiento 24/7.")
+                new SubtitleLine("SIMULACIÓN · ESCENARIO 6", "MODO DEFENSA (VIE 5): Hugo Benavides ve la impresora de confirmaciones SWIFT apagada sobre la mesa.", "def_intro_1"),
+                new SubtitleLine("PLAN DE RESPUESTA", "A diferencia del ataque de 2016, hoy cuentas con un Plan de Respuesta con roles, conciliación automática y escalamiento 24/7.", "def_intro_2")
             });
         }
         else
@@ -930,9 +997,9 @@ public class StoryDirector : MonoBehaviour
 
         var victoryLines = new List<SubtitleLine>
         {
-            new SubtitleLine("CON PLAN: CONGELADO EL VIERNES", $"¡Plan de Respuesta ejecutado en VIE 5! {chosenResp} activa el protocolo y reporta la falla de la impresora de inmediato."),
-            new SubtitleLine("RF-04 · DINERO NO SALE", "La conciliación diaria automática y el escalamiento inmediato bloquean las transferencias el mismo viernes (0 horas perdidas)."),
-            new SubtitleLine("NUEVO RESULTADO", "El plan armado cambió el resultado: el congelamiento ocurre el viernes y los US$58 millones NO salen del banco.")
+            new SubtitleLine("CON PLAN: CONGELADO EL VIERNES", $"¡Plan de Respuesta ejecutado en VIE 5! {chosenResp} activa el protocolo y reporta la falla de la impresora de inmediato.", "def_victory_1"),
+            new SubtitleLine("RF-04 · DINERO NO SALE", "La conciliación diaria automática y el escalamiento inmediato bloquean las transferencias el mismo viernes (0 horas perdidas).", "def_victory_2"),
+            new SubtitleLine("NUEVO RESULTADO", "El plan armado cambió el resultado: el congelamiento ocurre el viernes y los US$58 millones NO salen del banco.", "def_victory_3")
         };
 
         yield return PlayLines(victoryLines);
@@ -1143,14 +1210,16 @@ public class StoryDirector : MonoBehaviour
         {
             yield return ShowLine(new SubtitleLine(
                 $"ELECCIÓN ACERTADA · {day.day.ToString().ToUpper()}",
-                $"¡Excelente elección! Confirmaste correctamente que debía aplicarse '{correctAction}' a cargo de '{correctResp}'. Continuando con el caso..."
+                $"¡Excelente elección! Confirmaste correctamente que debía aplicarse '{correctAction}' a cargo de '{correctResp}'. Continuando con el caso...",
+                "decision_correct"
             ), true);
         }
         else
         {
             yield return ShowLine(new SubtitleLine(
                 $"RESPUESTA INCORRECTA · {day.day.ToString().ToUpper()}",
-                $"Tu elección ('{chosenAction}' / '{chosenResp}') fue incorrecta. Las respuestas correctas eran: Acción '{correctAction}' y Responsable '{correctResp}'. Continuando con el caso..."
+                $"Tu elección ('{chosenAction}' / '{chosenResp}') fue incorrecta. Las respuestas correctas eran: Acción '{correctAction}' y Responsable '{correctResp}'. Continuando con el caso...",
+                "decision_wrong"
             ), true);
         }
     }
@@ -1169,7 +1238,7 @@ public class StoryDirector : MonoBehaviour
 
         var lines = new List<SubtitleLine>
         {
-            new SubtitleLine("MAR 9 · 9:11 A.M.", "Martes 9, 9:11 a.m. En Filipinas por fin se lee la orden de congelar los fondos...")
+            new SubtitleLine("MAR 9 · 9:11 A.M.", "Martes 9, 9:11 a.m. En Filipinas por fin se lee la orden de congelar los fondos...", "mar_outcome_1")
         };
         yield return PlayLines(lines);
 
@@ -1177,8 +1246,8 @@ public class StoryDirector : MonoBehaviour
 
         var lost = new List<SubtitleLine>
         {
-            new SubtitleLine("CONGELADO: MARTES 9:11 · TARDE", "Ataque: la orden de congelar llega el martes. Es demasiado tarde: se acaban de retirar US$58 millones."),
-            new SubtitleLine("COMPARACIÓN", "CON PLAN: CONGELADO EL VIERNES. Ahora puedes cambiar a Modo Defensa para detener el ataque el viernes sin daños.")
+            new SubtitleLine("CONGELADO: MARTES 9:11 · TARDE", "Ataque: la orden de congelar llega el martes. Es demasiado tarde: se acaban de retirar US$58 millones.", "mar_outcome_2"),
+            new SubtitleLine("COMPARACIÓN", "CON PLAN: CONGELADO EL VIERNES. Ahora puedes cambiar a Modo Defensa para detener el ataque el viernes sin daños.", "mar_outcome_3")
         };
         yield return PlayLines(lost);
 
@@ -1359,6 +1428,26 @@ public class StoryDirector : MonoBehaviour
         yield return null;
         mTapRequested = false;
 
+        // Iniciar la locución por voz del narrador para este diálogo específico
+        float speechDuration = 0f;
+        if (narrator != null)
+        {
+            speechDuration = narrator.Speak(line);
+        }
+        else if (DialogueNarrator.I != null)
+        {
+            speechDuration = DialogueNarrator.I.Speak(line);
+        }
+
+        // Armonizar la velocidad de la máquina de escribir para que acompañe a la locución hablada
+        float effectiveCPS = charactersPerSecond;
+        float speechStartedAt = Time.time;
+        if (speechDuration > 0.5f && total > 0)
+        {
+            float targetCPS = (float)total / Mathf.Max(1.0f, speechDuration * 0.85f);
+            effectiveCPS = Mathf.Clamp(targetCPS, 22f, 65f);
+        }
+
         while (subtitleText != null && visible < total)
         {
             if (mTapRequested)
@@ -1366,12 +1455,12 @@ public class StoryDirector : MonoBehaviour
                 mTapRequested = false;
                 break;
             }
-            visible += charactersPerSecond * Time.deltaTime;
+            visible += effectiveCPS * Time.deltaTime;
             tickTimer += Time.deltaTime;
             if (tickTimer >= 0.08f)
             {
                 tickTimer = 0f;
-                PlayTypewriterTick();
+                if (speechDuration <= 0f) PlayTypewriterTick();
             }
             subtitleText.maxVisibleCharacters = Mathf.Min(total, Mathf.FloorToInt(visible));
             yield return null;
@@ -1386,7 +1475,9 @@ public class StoryDirector : MonoBehaviour
             continueHintText.gameObject.SetActive(true);
         }
 
-        float hold = autoAdvance ? Mathf.Clamp(1.6f + total * 0.032f, 2.2f, 5.2f) : float.MaxValue;
+        float baseHold = Mathf.Clamp(1.6f + total * 0.032f, 2.2f, 5.2f);
+        float remainingSpeech = Mathf.Max(0f, speechDuration - (Time.time - speechStartedAt));
+        float hold = autoAdvance ? (speechDuration > 0f ? Mathf.Max(0.65f, remainingSpeech + 0.35f) : baseHold) : float.MaxValue;
         float t = 0f;
         while (t < hold && !mTapRequested)
         {
@@ -1394,14 +1485,20 @@ public class StoryDirector : MonoBehaviour
             yield return null;
         }
 
+        if (narrator != null) narrator.StopSpeaking();
+        else if (DialogueNarrator.I != null) DialogueNarrator.I.StopSpeaking();
+
         mTapRequested = false;
         mBusyWithLine = false;
     }
 
     private void ShowPersistentPrompt(string prompt)
     {
+        if (narrator != null) narrator.StopSpeaking();
+        else if (DialogueNarrator.I != null) DialogueNarrator.I.StopSpeaking();
+
         SetActiveSafe(subtitlePanel, true);
-        if (speakerText != null) speakerText.text = "[ TU TURNO - INTERACTUA EN LA MESA ]";
+        if (speakerText != null) speakerText.text = "TU TURNO  /  INVESTIGA";
         if (subtitleText != null)
         {
             subtitleText.text = prompt;
@@ -1424,7 +1521,7 @@ public class StoryDirector : MonoBehaviour
         while (t < duration)
         {
             t += Time.deltaTime;
-            transitionGroup.alpha = Mathf.Lerp(from, to, t / duration);
+            transitionGroup.alpha = Mathf.Lerp(from, to, Mathf.SmoothStep(0f, 1f, t / duration));
             yield return null;
         }
         SetTransitionVisible(to > 0.5f, to);
@@ -1446,8 +1543,10 @@ public class StoryDirector : MonoBehaviour
         {
             t += Time.deltaTime;
             float k = Mathf.Clamp01(t / duration);
-            float eased = to > from ? 1f - Mathf.Pow(1f - k, 3f) : k * k;
-            target.localScale = baseScale * Mathf.Lerp(from, to, eased);
+            float eased = to > from
+                ? 1f + 2.2f * Mathf.Pow(k - 1f, 3f) + 1.2f * Mathf.Pow(k - 1f, 2f)
+                : k * k * (3f - 2f * k);
+            target.localScale = baseScale * Mathf.LerpUnclamped(from, to, eased);
             yield return null;
         }
         target.localScale = baseScale * to;
@@ -1496,15 +1595,17 @@ public class StoryDirector : MonoBehaviour
             startScale.Add(m.localScale);
         }
 
-        while (t < 1.5f)
+        float exitDuration = 1.5f + Mathf.Max(0, money.Count - 1) * 0.18f;
+        while (t < exitDuration)
         {
             t += Time.deltaTime;
-            float k = t / 1.5f;
             for (int i = 0; i < money.Count; i++)
             {
                 if (money[i] == null) continue;
-                money[i].localPosition = startPos[i] + new Vector3(0.4f * k, 4.0f * k, -0.2f * k);
-                money[i].localScale = Vector3.Lerp(startScale[i], Vector3.zero, k);
+                float k = Mathf.Clamp01((t - i * 0.18f) / 1.5f);
+                float eased = k * k * (3f - 2f * k);
+                money[i].localPosition = startPos[i] + new Vector3(0.55f * eased, 2f * Mathf.Sin(k * Mathf.PI) + 3f * eased, -0.3f * eased);
+                money[i].localScale = startScale[i] * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.55f, 1f, k)));
             }
             yield return null;
         }
@@ -1605,9 +1706,13 @@ public class StoryDirector : MonoBehaviour
 
     private void PlayTypewriterTick()
     {
+        // Si el narrador está hablando, silenciar el tecleo para que la locución se escuche con máxima claridad
+        if (narrator != null && narrator.IsSpeaking) return;
+        if (DialogueNarrator.I != null && DialogueNarrator.I.IsSpeaking) return;
+
         if (audioSource != null && typewriterTickClip != null)
         {
-            audioSource.PlayOneShot(typewriterTickClip, 0.22f);
+            audioSource.PlayOneShot(typewriterTickClip, 0.12f);
         }
     }
 
@@ -1708,13 +1813,13 @@ public class StoryDirector : MonoBehaviour
                 hoursSinceSignal = 0f,
                 introLines = new List<SubtitleLine>
                 {
-                    new SubtitleLine("ATAQUE 2016 · VIE 5", "Viernes 5. Sala SWIFT del banco sobre tu mesa. Hugo Benavides ve la impresora de confirmaciones apagada."),
-                    new SubtitleLine("HUGO BENAVIDES", "La impresora está apagada otra vez... seguro es una avería común. No hace falta reportarlo hoy.")
+                    new SubtitleLine("ATAQUE 2016 · VIE 5", "Viernes 5. Sala SWIFT del banco sobre tu mesa. Hugo Benavides ve la impresora de confirmaciones apagada.", "vie_intro_1"),
+                    new SubtitleLine("HUGO BENAVIDES", "La impresora está apagada otra vez... seguro es una avería común. No hace falta reportarlo hoy.", "vie_intro_2")
                 },
                 investigatePrompt = ">> TOCA LA IMPRESORA APAGADA O A HUGO BENAVIDES sobre la mesa para inspeccionar qué ocurrió el Viernes 5.",
                 attackLines = new List<SubtitleLine>
                 {
-                    new SubtitleLine("VIE 5 -> SÁB 6", "Sin plan de respuesta, Hugo no reporta la falla. Nadie revisa las transferencias y el ataque pasa al Sábado 6...")
+                    new SubtitleLine("VIE 5 -> SÁB 6", "Sin plan de respuesta, Hugo no reporta la falla. Nadie revisa las transferencias y el ataque pasa al Sábado 6...", "vie_attack")
                 },
                 decisionQuestion = "MODO DEFENSA (VIE 5): Activa el Plan de Respuesta para congelar los fondos el viernes",
                 correctActionIndex = 0,
@@ -1729,13 +1834,13 @@ public class StoryDirector : MonoBehaviour
                 hoursSinceSignal = 24f,
                 introLines = new List<SubtitleLine>
                 {
-                    new SubtitleLine("ATAQUE 2016 · SÁB 6", "Sábado 6. Al intentar reiniciar el sistema aparece en el monitor: 'A file is missing or changed'."),
-                    new SubtitleLine("NARRADOR", "Nadie investiga qué archivo del servidor SWIFT fue alterado.")
+                    new SubtitleLine("ATAQUE 2016 · SÁB 6", "Sábado 6. Al intentar reiniciar el sistema aparece en el monitor: 'A file is missing or changed'.", "sab_intro_1"),
+                    new SubtitleLine("NARRADOR", "Nadie investiga qué archivo del servidor SWIFT fue alterado.", "sab_intro_2")
                 },
                 investigatePrompt = ">> TOCA EL MONITOR CON ERROR ROJO O EL SERVIDOR sobre la mesa para ver lo ocurrido el Sábado 6.",
                 attackLines = new List<SubtitleLine>
                 {
-                    new SubtitleLine("SÁB 6 -> DOM 7 -> LUN 8", "Pasa el Sábado 6 y todo el Domingo 7 sin conciliación automática. El caso avanza hasta el Lunes 8...")
+                    new SubtitleLine("SÁB 6 -> DOM 7 -> LUN 8", "Pasa el Sábado 6 y todo el Domingo 7 sin conciliación automática. El caso avanza hasta el Lunes 8...", "sab_attack")
                 },
                 decisionQuestion = "SÁB 6: Aparece 'A file is missing or changed'",
                 correctActionIndex = 1,
@@ -1750,13 +1855,13 @@ public class StoryDirector : MonoBehaviour
                 hoursSinceSignal = 72f,
                 introLines = new List<SubtitleLine>
                 {
-                    new SubtitleLine("ATAQUE 2016 · LUN 8", "Lunes 8. Tras perder todo el fin de semana (SÁB 6 y DOM 7), el banco intenta pedir que congelen los fondos."),
-                    new SubtitleLine("BANCO EN FILIPINAS", "Hoy es feriado en Filipinas. Nadie contesta del otro lado.")
+                    new SubtitleLine("ATAQUE 2016 · LUN 8", "Lunes 8. Tras perder todo el fin de semana (SÁB 6 y DOM 7), el banco intenta pedir que congelen los fondos.", "lun_intro_1"),
+                    new SubtitleLine("BANCO EN FILIPINAS", "Hoy es feriado en Filipinas. Nadie contesta del otro lado.", "lun_intro_2")
                 },
                 investigatePrompt = ">> TOCA EL BANCO DE FILIPINAS O LA BARRERA DE FERIADO sobre la mesa para ver el bloqueo del Lunes 8.",
                 attackLines = new List<SubtitleLine>
                 {
-                    new SubtitleLine("LUN 8 -> MAR 9", "Sin canal de escalamiento inmediato 24/7, la orden de congelar queda sin leerse hasta el Martes 9...")
+                    new SubtitleLine("LUN 8 -> MAR 9", "Sin canal de escalamiento inmediato 24/7, la orden de congelar queda sin leerse hasta el Martes 9...", "lun_attack")
                 },
                 decisionQuestion = "LUN 8: Piden congelar fondos, pero en Filipinas es feriado",
                 correctActionIndex = 2,
@@ -1771,7 +1876,7 @@ public class StoryDirector : MonoBehaviour
                 hoursSinceSignal = 85f,
                 introLines = new List<SubtitleLine>
                 {
-                    new SubtitleLine("ATAQUE 2016 · MAR 9", "Martes 9, 9:11 a.m. Frente a ti en la mesa está la bóveda bancaria cuando por fin se lee la orden.")
+                    new SubtitleLine("ATAQUE 2016 · MAR 9", "Martes 9, 9:11 a.m. Frente a ti en la mesa está la bóveda bancaria cuando por fin se lee la orden.", "mar_intro_1")
                 },
                 investigatePrompt = ">> TOCA LA BÓVEDA BANCARIA O LOS LOTES DE DINERO sobre la mesa para ver el desenlace del Martes 9.",
                 correctActionIndex = -1

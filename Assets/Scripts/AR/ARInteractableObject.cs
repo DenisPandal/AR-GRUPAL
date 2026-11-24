@@ -147,23 +147,31 @@ public class ARInteractableObject : MonoBehaviour
 
     public void ResetInteractionState()
     {
+        StopAllCoroutines();
+        CacheScale();
+        transform.localScale = mBaseLocalScale;
         mHasBeenInspected = false;
         mHasBeenResolved = false;
     }
 
     private IEnumerator AnimateTouchPulse()
     {
-        float duration = 0.22f;
+        float duration = 0.42f;
         float elapsed = 0f;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
-            float scaleFactor = 1.0f + Mathf.Sin(t * Mathf.PI) * 0.18f;
+            float scaleFactor = 1.0f + Mathf.Sin(t * Mathf.PI * 2f) * (1f - t) * 0.12f;
             transform.localScale = mBaseLocalScale * scaleFactor;
             yield return null;
         }
         transform.localScale = mBaseLocalScale;
     }
-}
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        if (mScaleCached) transform.localScale = mBaseLocalScale;
+    }
+}

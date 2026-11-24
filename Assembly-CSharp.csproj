@@ -64,15 +64,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Story\StoryDirector.cs" />
+    <Compile Include="Assets\Scripts\UI\PanelEntrance.cs" />
     <Compile Include="Assets\Scripts\Core\SimMode.cs" />
     <Compile Include="Assets\Scripts\UI\PlanBuilder.cs" />
     <Compile Include="Assets\Scripts\UI\ScenarioHUDController.cs" />
+    <Compile Include="Assets\Scripts\UI\ModernHUDPresentation.cs" />
     <Compile Include="Assets\Scripts\Core\ScenarioData.cs" />
     <Compile Include="Assets\Scripts\AR\ARInteractableObject.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\Logic\IncidentTimer.cs" />
     <Compile Include="Assets\Scripts\UI\ContextBubble.cs" />
     <Compile Include="Assets\Scripts\AR\FloatingAnimation.cs" />
+    <Compile Include="Assets\Scripts\Audio\DialogueNarrator.cs" />
     <Compile Include="Assets\Scripts\AR\ARSurfaceAndInteractionManager.cs" />
     <Compile Include="Assets\Scripts\Logic\ActionPicker.cs" />
     <Compile Include="Assets\Scripts\AR\DayTarget.cs" />

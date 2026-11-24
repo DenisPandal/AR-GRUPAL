@@ -1,0 +1,137 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\TRABAJO AR GRUPAL\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|c:\\trabajo ar grupal\\assets\\scripts\\ar\\daytarget.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ar\\daytarget.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|C:\\TRABAJO AR GRUPAL\\assets\\scripts\\core\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\core\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|C:\\TRABAJO AR GRUPAL\\assets\\scripts\\ui\\planbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ui\\planbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|C:\\TRABAJO AR GRUPAL\\assets\\scripts\\logic\\actionpicker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\logic\\actionpicker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|C:\\TRABAJO AR GRUPAL\\assets\\scripts\\story\\storydirector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\story\\storydirector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|C:\\TRABAJO AR GRUPAL\\assets\\scripts\\logic\\incidenttimer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\logic\\incidenttimer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|C:\\TRABAJO AR GRUPAL\\assets\\scripts\\ar\\arinteractableobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{82FFA104-E1F4-B802-E57B-B57E241A1D28}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ar\\arinteractableobject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DayTarget.cs",
+              "DocumentMoniker": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\AR\\DayTarget.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\AR\\DayTarget.cs",
+              "ToolTip": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\AR\\DayTarget.cs",
+              "RelativeToolTip": "Assets\\Scripts\\AR\\DayTarget.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAAAwCkAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-19T23:01:54.759Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GameManager.cs",
+              "DocumentMoniker": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\Core\\GameManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Core\\GameManager.cs",
+              "ToolTip": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\Core\\GameManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Core\\GameManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-19T23:04:28.237Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PlanBuilder.cs",
+              "DocumentMoniker": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\UI\\PlanBuilder.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\UI\\PlanBuilder.cs",
+              "ToolTip": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\UI\\PlanBuilder.cs",
+              "RelativeToolTip": "Assets\\Scripts\\UI\\PlanBuilder.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-19T23:04:09.418Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ActionPicker.cs",
+              "DocumentMoniker": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\Logic\\ActionPicker.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Logic\\ActionPicker.cs",
+              "ToolTip": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\Logic\\ActionPicker.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Logic\\ActionPicker.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-19T23:03:25.661Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ARInteractableObject.cs",
+              "DocumentMoniker": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\AR\\ARInteractableObject.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\AR\\ARInteractableObject.cs",
+              "ToolTip": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\AR\\ARInteractableObject.cs",
+              "RelativeToolTip": "Assets\\Scripts\\AR\\ARInteractableObject.cs",
+              "ViewState": "AgIAAJEAAAAAAAAAAADwv6kAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-19T22:31:00.696Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IncidentTimer.cs",
+              "DocumentMoniker": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\Logic\\IncidentTimer.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Logic\\IncidentTimer.cs",
+              "ToolTip": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\Logic\\IncidentTimer.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Logic\\IncidentTimer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-19T23:02:54.868Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "StoryDirector.cs",
+              "DocumentMoniker": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\Story\\StoryDirector.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Story\\StoryDirector.cs",
+              "ToolTip": "C:\\TRABAJO AR GRUPAL\\Assets\\Scripts\\Story\\StoryDirector.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Story\\StoryDirector.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-19T23:02:30.657Z"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

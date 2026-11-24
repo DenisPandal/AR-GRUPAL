@@ -292,11 +292,11 @@ public class ScenarioHUDController : MonoBehaviour
         {
             if (gameManager.mode == SimMode.Defensa)
             {
-                statusHeaderText.text = $"<color=#38BDF8><b>[ESCENARIO 06]</b></color> <color=#475569>|</color> <color=#4ADE80><b>MODO DEFENSA</b></color> <color=#475569>|</color> <color=#F8FAFC><b>{dayBadge}</b></color>";
+                statusHeaderText.text = $"<color=#59DEC9>06 / DEFENSA</color>\n<b>{dayBadge}</b>";
             }
             else
             {
-                statusHeaderText.text = $"<color=#38BDF8><b>[ESCENARIO 06]</b></color> <color=#475569>|</color> <color=#F87171><b>ATAQUE 2016</b></color> <color=#475569>|</color> <color=#F8FAFC><b>{dayBadge}</b></color>";
+                statusHeaderText.text = $"<color=#F4AA8B>06 / ATAQUE 2016</color>\n<b>{dayBadge}</b>";
             }
         }
 
@@ -304,11 +304,11 @@ public class ScenarioHUDController : MonoBehaviour
         {
             if (gameManager.mode == SimMode.Defensa)
             {
-                modeButtonText.text = "<b>MODO: <color=#4ADE80>DEFENSA</color></b>\n<size=13><color=#CBD5E1>[Toca para cambiar]</color></size>";
+                modeButtonText.text = "Cambiar modo";
             }
             else
             {
-                modeButtonText.text = "<b>MODO: <color=#F87171>ATAQUE</color></b>\n<size=13><color=#CBD5E1>[Toca para cambiar]</color></size>";
+                modeButtonText.text = "Cambiar modo";
             }
         }
 
@@ -338,4 +338,3 @@ public class ScenarioHUDController : MonoBehaviour
         return list[mCurrentResponsibleIndex];
     }
 }
-
